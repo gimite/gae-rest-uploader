@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!--
+  Author: Hiroshi Ichikawa <http://gimite.net/>
+  The license of this source is "New BSD Licence"
+-->
+<html><head>
+  <meta charset="utf-8"> 
+  <title>Admin - GAE REST Uploader</title>
+  <style type="text/css">
+    .message {
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+</head><body>
+
+  <h1>GAE REST Uploader</h1>
+
+  {% if uploaded_path %}
+    <p class="message">Uploaded <a href="{{uploaded_path}}" target="_blank">{{uploaded_path}}</a>.</p>
+  {% elif deleted_path %}
+    <p class="message">Deleted {{deleted_path}}.</p>
+  {% endif %}
+
+  <p>Auth code: <b>{{auth_code}}</b></p>
+
+  <p>To upload a file, you can send a HTTP<b>S</b> PUT request by a command like this:</p>
+
+  <pre>
+$ curl -X PUT -H 'content-type: text/html' -d 'Hello world!' '{{base_url}}hello?auth_code={{auth_code}}'</pre>
+
+  <p>Or a Python script like this:</p>
+
+  <pre>
+import requests
+r = requests.put(
+    '{{base_url}}hello?auth_code={{auth_code}}',
+    data='Hello world!',
+    headers={'content-type': 'text/html'})
+assert r.status_code == 200, r.text</pre>
+
+  <p>Then you can see the file at <a href="{{base_url}}hello" target="_blank">{{base_url}}hello</a>.</p>
+
+  <p>You can delete a file with a HTTPS DELETE reqeust.</p>
+
+  <p>You can also manually upload files with this form:</p>
+
+  <form action="/admin/upload" method="post" enctype="multipart/form-data">
+    <div>Path: <input type="text" name="path" placeholder="e.g., /hello"></div>
+    <div><input type="file" name="body"></div>
+    <div>Content type (optional): <input type="text" name="content_type" placeholder="e.g., text/html"></div>
+    <div>
+      <input type="submit" name="upload" value="Upload">
+      <input type="submit" name="delete" value="Delete">
+    </div>
+  </form>
+
+</body></html>
